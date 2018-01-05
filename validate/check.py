@@ -1,28 +1,32 @@
+# coding=utf8
+
 from validate.utils import id_card, enum, url, email, equal_to, min_value, max_value, range_value, min_length, \
-    max_length, range_length, pattern, custom, ipv4, ipv6, date
+    max_length, range_length, pattern, custom, ipv4, ipv6, date, tel, post_code
 
 __all__ = ['default_msg',
            'validate']
 
 default_msg = {
-    'required': '字段必填.',
-    'enum': '字段必须在给定的范围内.',
-    'type': '字段类型不正确.',
-    'email': '字段不符合电子邮件格式.',
-    'url': '字段不是合法的url.',
-    'equal_to': '字段两次输入的值不相等.',
-    'min': '字段的值太小.',
-    'max': '字段的值太大.',
-    'range': '字段的值不在范围内.',
-    'min_length': '字段太短.',
-    'max_length': '字段太长.',
-    'range_length': '字段的长度不在范围内.',
-    'pattern:': '字段符合正则表达式.',
-    'custom': '字段验证不通过.',
-    'id_card': '字段不是合法的身份证号.',
-    'ipv4': '字段不是一个合法的ip4地址.',
-    'ipv6': '字段不是一个合法的ip6地址.',
-    'date': '字段不是一个合法的时间格式.'
+    'required': u'字段必填.',
+    'enum': u'字段必须在给定的范围内.',
+    'type': u'字段类型不正确.',
+    'email': u'字段不符合电子邮件格式.',
+    'url': u'字段不是合法的url.',
+    'equal_to': u'字段两次输入的值不相等.',
+    'min': u'字段的值太小.',
+    'max': u'字段的值太大.',
+    'range': u'字段的值不在范围内.',
+    'min_length': u'字段太短.',
+    'max_length': u'字段太长.',
+    'range_length': u'字段的长度不在范围内.',
+    'pattern:': u'字段符合正则表达式.',
+    'custom': u'字段验证不通过.',
+    'id_card': u'字段不是合法的身份证号.',
+    'ipv4': u'字段不是一个合法的ip4地址.',
+    'ipv6': u'字段不是一个合法的ip6地址.',
+    'date': u'字段不是一个合法的时间格式.',
+    'tel': u'字段不是一个合法的电话号码',
+    'post_code': u'字段不是合法的邮编'
 }
 
 
@@ -36,7 +40,7 @@ class ERRMSG(dict):
     """
 
     def __init__(self, msg, **kwargs):
-        super().__init__(**kwargs)
+        super(ERRMSG, self).__init__(**kwargs)
         self.msg = msg
 
     def __getitem__(self, item):
@@ -133,7 +137,7 @@ def __val_field(field, rule, obj):
 
     if 'equal_to' in rule:
         if equal_to(obj[rule['equal_to']], value) is False:
-            return 'equal_to'
+            return False, 'equal_to'
 
     if 'min' in rule:
         if min_value(value, rule['min']) is False:
@@ -147,7 +151,6 @@ def __val_field(field, rule, obj):
         if range_value(value, rule['range']) is False:
             return False, 'range'
 
-    # 只有字符串才能验证长度，其他数据类型不能,汉字算一个字符
     if 'min_length' in rule:
         if min_length(value, rule['min_length']) is False:
             return False, 'min_length'
@@ -172,11 +175,11 @@ def __val_field(field, rule, obj):
         if id_card(obj['field']) is False:
             return False, 'id_card'
 
-    if 'ipv4' in rule and rule['ipv4']:
+    if 'ipv4' in rule and rule['ipv4'] is True:
         if not ipv4(value):
             return False, 'ipv4'
 
-    if 'ipv6' in rule and rule['ipv6']:
+    if 'ipv6' in rule and rule['ipv6'] is True:
         if not ipv6(value):
             return False, 'ipv6'
 
@@ -184,6 +187,14 @@ def __val_field(field, rule, obj):
         date_rule = rule['date']
         if not date(value, date_rule):
             return False, 'date'
+
+    if 'tel' in rule and rule['tel'] is True:
+        if not tel(value):
+            return False, 'tel'
+
+    if 'post_code' in rule and rule['post_code'] is True:
+        if not post_code(value):
+            return False, 'post_code'
 
     return True, field
 

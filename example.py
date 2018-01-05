@@ -1,3 +1,5 @@
+# coding=utf8
+
 from validate import check
 
 
@@ -14,23 +16,11 @@ def custom(filed, value):
 
 if __name__ == '__main__':
     # 覆盖默认提示
-    check.default_msg['required'] = '字段必填'
-    msg = {
-        'name': {
-            # 默认消息提示，如果找不到下一级的消息提示则提示该消息
-            '_default': '默认消息提示',
-
-            # 覆盖默认提示
-            'enum': '姓名必须在huen和rean中'
-        },
-        'confirm_password': {
-            'equal_to': '两次输入的密码不一样。'
-        }
-    }
-    # 消息查找顺序
-    # 1.自定义每个属性的消息
-    # 2.字段默认消息（_default）
-    # 3.全局默认消息
+    check.default_msg['required'] = u'字段必填'
+    # 提示查找顺序
+    # 1.自定义每个属性的提示
+    # 2.字段默认提示（_default）
+    # 3.全局默认提示
 
     rule = {
         'all_validate': True,  # 全部验证在返回，否则只要有错就返回
@@ -39,32 +29,41 @@ if __name__ == '__main__':
                 'required': True,
                 'enum': ['rean', 'huen'],
                 'type': str,
-                'range': [1, 100],
-                'range_length': [2, 10],
             },
-            'password': {
-                'email': True,
-                'range_length': [16, 20]
-            },
-            'confirm_password': {
-                'equal_to': 'password',
-                'message': '两次的密码不一样'
+            'email': {
+                'required': True,
+                'email': True
             },
             'home_page': {
                 'url': True
             },
+
+            'password': {
+                'range_length': [16, 20]
+            },
+            'confirm_password': {
+                'equal_to': 'password',  # password 字段一样
+            },
+            'age': {
+                'min': 0,
+                'max': 130
+            },
             'score': {
-                'range': [200, 2000]
+                'range': [0, 100]
             },
             'address': {
                 'min_length': 4,
-                'max_length': 10
-            },
-            'address1': {
-                'range_length': [2, 10]
+                'max_length': 40,
+                'range_length': (4, 40)
             },
             'ipaddr': {
-                'custom': custom
+                'custom': custom  # 自定义函数验证
+            },
+            'phone_number': {
+                'tel': True
+            },
+            'post_code': {
+                'post_code': True
             },
             'birth': {
                 'date': {
@@ -74,35 +73,39 @@ if __name__ == '__main__':
                     'range': ['2018-01-01', '2018-01-31']
                 }
             }
-
         },
         'msg': {
             'name': {
                 # 默认消息提示，如果找不到下一级的消息提示则提示该消息
-                '_default': '默认消息提示',
-
+                '_default': u'默认消息提示',
                 # 覆盖默认提示
-                'enum': '姓名必须在huen和rean中'
+                'enum': u'姓名必须在huen和rean中'
             },
             'confirm_password': {
-                'equal_to': '两次输入的密码不一样。'
+                'equal_to': u'两次输入的密码不一样。'
             },
             'birth': {
-                'date': '生日输入不正确.'
+                'date': u'生日输入不正确.'
             }
         }
     }
 
-    obj = {
+    value = {
         'name': 'rean',
-        'password': '674038364@qq.com',
+        'email': 'rean.ren@qq.com',
+        'password': '1234567890123456',
         'home_page': 'http://baidu.com',
-        'confirm_password': '674038364@qq.com',
-        'score': 200,
+        'confirm_password': '1234567890123456',
+        'age': 30,
+        'score': 90,
         'address': '花22dasdsadsadsadasdsad道',
-        'address1': '22',
         'ipaddr': '255.255.255.255',
+        'phone_number': '13984927617',
+        'post_code': '564500',
         'birth': '2018-01-43'
     }
-    print(check.validate(rule, obj))
+    print(check.validate(rule, value))
     print(check.id_card('52130199310062011'))
+
+    # (False, [('address', '字段太长.'), ('birth', '生日输入不正确.')], ['name', 'email', 'home_page', 'password', 'confirm_password', 'age', 'score', 'ipaddr', 'phone_number', 'post_code'])
+    # False

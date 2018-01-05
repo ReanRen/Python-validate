@@ -1,0 +1,4 @@
+# python-validate changelog
+
+## 2018年1月5日 0.0.2-dev
+first public version.

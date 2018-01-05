@@ -1,14 +1,13 @@
+# coding=utf8
+
 import re
 
 try:
-    from .id_card import id_card
-except ImportError:
     from id_card import id_card
-
-try:
-    from .vdate import date
-except ImportError:
     from vdate import date
+except ImportError:
+    from .id_card import id_card
+    from .vdate import date
 
 __all__ = [
     'id_card',
@@ -27,6 +26,8 @@ __all__ = [
     'custom',
     'ipv4',
     'ipv6',
+    'tel',
+    'post_code'
 ]
 
 
@@ -36,7 +37,7 @@ def email(val):
     :param val:电子邮件地址
     :return:
     """
-    return pattern(val, '^([a-zA-Z0-9_-])+@([a-zA-Z0-9_-])+(.[a-zA-Z0-9_-])+')
+    return pattern(val, '^[A-Za-z\d]+([-_.][A-Za-z\d]+)*@([A-Za-z\d]+[-.])+[A-Za-z\d]+$')
 
 
 def enum(val, coll):
@@ -102,12 +103,15 @@ def range_value(val, limit):
     :param limit:
     :return:
     """
-    try:
-        a, b, c = int(limit[0]), int(val), int(limit[1])
-    except ValueError:
-        a, b, c = str(limit[0]), str(val), str(limit[1])
+    if (isinstance(limit, tuple) or isinstance(limit, list)) and len(limit) == 2:
+        try:
+            a, b, c = int(limit[0]), int(val), int(limit[1])
+        except ValueError:
+            a, b, c = str(limit[0]), str(val), str(limit[1])
 
-    return a <= b <= c
+        return a <= b <= c
+
+    return False
 
 
 def min_length(val, limit):
@@ -137,7 +141,10 @@ def range_length(val, limit):
     :param limit:
     :return:
     """
-    return limit[0] <= len(str(val)) <= limit[1]
+    if (isinstance(limit, tuple) or isinstance(limit, list)) and len(limit) == 2:
+        return limit[0] <= len(str(val)) <= limit[1]
+
+    return False
 
 
 def pattern(val, limit):
@@ -210,5 +217,3 @@ if __name__ == '__main__':
     print(min_length(22, 1))
     print(ipv4('192.168.168.1'))
     print(ipv6('fe80::356c:4a6f:64f4:c88e'))
-
-
