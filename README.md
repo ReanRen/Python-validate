@@ -242,4 +242,4 @@ rule={
 请参考[example.py](example.py).
 
 # 4.欢迎提issue和PR
-有更好的验证方法和建议，欢迎提issue和PR，weolcome!
+有更好的验证方法和建议，欢迎提issue和PR，welcome!
